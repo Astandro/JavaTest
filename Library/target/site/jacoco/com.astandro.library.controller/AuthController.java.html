@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">library</a> &gt; <a href="index.source.html" class="el_package">com.astandro.library.controller</a> &gt; <span class="el_source">AuthController.java</span></div><h1>AuthController.java</h1><pre class="source lang-java linenums">package com.astandro.library.controller;
+
+import com.astandro.library.dto.LoginRequest;
+import com.astandro.library.dto.UserRegistration;
+import com.astandro.library.repository.UserRepository;
+import com.astandro.library.repository.entity.User;
+import com.astandro.library.service.AuthService;
+import com.astandro.library.service.MfaService;
+import com.astandro.library.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import jakarta.validation.Valid;
+import java.util.Optional;
+
+@RestController
+@RequestMapping(&quot;/api/auth&quot;)
+@Tag(name = &quot;Auth&quot;, description = &quot;Operations related to Authorization&quot;)
+public class AuthController {
+
+    @Autowired
+    private MfaService mfaService;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    private String generatedOtp;
+    private final AuthService authService;
+
+    @Autowired
+    private UserService userService;
+
+<span class="fc" id="L38">    public AuthController(AuthService authService, MfaService mfaService, UserService userService, UserRepository userRepository) {</span>
+<span class="fc" id="L39">        this.authService = authService;</span>
+<span class="fc" id="L40">        this.mfaService = mfaService;</span>
+<span class="fc" id="L41">        this.userService = userService;</span>
+<span class="fc" id="L42">        this.userRepository = userRepository;</span>
+<span class="fc" id="L43">    }</span>
+
+    @Cacheable(value = &quot;users&quot;, key = &quot;#loginRequest.usernameOrEmail&quot;)
+    @PostMapping(&quot;/login&quot;)
+    @Operation(summary = &quot;User login&quot;)
+    public String login(@RequestBody LoginRequest loginRequest) {
+<span class="fc" id="L49">        System.out.println(&quot;Fetching user login from database for &quot; + loginRequest.getUsernameOrEmail());</span>
+<span class="fc" id="L50">        return authService.authenticate(loginRequest);</span>
+    }
+
+    @PostMapping(&quot;/register&quot;)
+    @Operation(summary = &quot;Register new user&quot;)
+    public ResponseEntity&lt;User&gt; registerUser(@Valid @RequestBody UserRegistration registration) {
+<span class="fc" id="L56">        User registeredUser = authService.registerUser(registration);</span>
+<span class="fc" id="L57">        return new ResponseEntity&lt;&gt;(registeredUser, HttpStatus.CREATED);</span>
+    }
+
+    // Endpoint to request OTP
+    @PostMapping(&quot;/request-otp&quot;)
+    @Operation(summary = &quot;Request otp for MFA&quot;)
+    public ResponseEntity&lt;String&gt; requestOtp(@RequestParam String email) {
+<span class="fc" id="L64">        Optional&lt;User&gt; userOpt = (Optional&lt;User&gt;) userService.getUserByEmail(email);</span>
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">        if (userOpt.isPresent()) {</span>
+            // Generate OTP and send it
+<span class="fc" id="L67">            generatedOtp = mfaService.generateOtp();</span>
+<span class="fc" id="L68">            mfaService.sendOtpEmail(email, generatedOtp);</span>
+<span class="fc" id="L69">            return ResponseEntity.ok(&quot;OTP sent to your email.&quot;);</span>
+        } else {
+<span class="nc" id="L71">            return ResponseEntity.status(404).body(&quot;User not found.&quot;);</span>
+        }
+    }
+
+    // Endpoint to verify OTP
+    @PostMapping(&quot;/verify-otp&quot;)
+    @Operation(summary = &quot;Verify otp for MFA&quot;)
+    public ResponseEntity&lt;String&gt; verifyOtp(@RequestParam String email, @RequestParam String otp) {
+<span class="fc" id="L79">        Optional&lt;User&gt; userOpt = (Optional&lt;User&gt;) userService.getUserByEmail(email);</span>
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">        if (userOpt.isPresent()) {</span>
+            // Verify OTP
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">            if (generatedOtp.equals(otp)) {</span>
+                // Mark MFA as enabled for the user
+<span class="fc" id="L84">                User user = userOpt.get();</span>
+<span class="fc" id="L85">                user.setMfaEnabled();</span>
+<span class="fc" id="L86">                userRepository.save(user);</span>
+<span class="fc" id="L87">                return ResponseEntity.ok(&quot;MFA enabled successfully.&quot;);</span>
+            } else {
+<span class="nc" id="L89">                return ResponseEntity.status(400).body(&quot;Invalid OTP.&quot;);</span>
+            }
+        } else {
+<span class="nc" id="L92">            return ResponseEntity.status(404).body(&quot;User not found.&quot;);</span>
+        }
+    }
+
+    public void setGeneratedOtp(String generatedOtp) {
+<span class="fc" id="L97">        this.generatedOtp = generatedOtp;</span>
+<span class="fc" id="L98">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RepositoryTestConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">library</a> &gt; <a href="index.source.html" class="el_package">com.astandro.library.config</a> &gt; <span class="el_source">RepositoryTestConfig.java</span></div><h1>RepositoryTestConfig.java</h1><pre class="source lang-java linenums">package com.astandro.library.config;
+
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+<span class="fc" id="L6">public class RepositoryTestConfig {</span>
+
+//    @Bean
+//    public CommandLineRunner testRepositories(BookRepository bookRepository, UserRepository userRepository) {
+//        return args -&gt; {
+//            // Test saving a book
+//            Book book = new Book();
+//            book.setTitle(&quot;Test Book&quot;);
+//            book.setAuthorId(1L);
+//            book.setContent(&quot;This is a test book content.&quot;);
+//            bookRepository.save(book);
+//
+//            // Test saving a user
+//            User user = new User();
+//            user.setUsername(&quot;testuser&quot;);
+//            user.setEmail(&quot;testuser@example.com&quot;);
+//            user.setFullName(&quot;Test User&quot;);
+//            user.setPassword(&quot;password123&quot;);
+//            user.setIsMfaEnabled(false);
+//            userRepository.save(user);
+//
+//            // Fetch data
+//            System.out.println(&quot;Books in DB: &quot; + bookRepository.findAll());
+//            System.out.println(&quot;Users in DB: &quot; + userRepository.findAll());
+//        };
+//    }
+
+//    @Bean
+//    public CommandLineRunner testServiceLayer(BookService bookService) {
+//        return args -&gt; {
+//            // Create a new book
+//            Book book = new Book();
+//            book.setTitle(&quot;Service Layer Test&quot;);
+//            book.setAuthorId(1L);
+//            book.setContent(&quot;Testing service layer logic.&quot;);
+//            Book savedBook = bookService.createBook(book);
+//            System.out.println(&quot;Created Book: &quot; + savedBook);
+//
+//            // Fetch all books
+//            System.out.println(&quot;All Books: &quot; + bookService.getAllBooks());
+//        };
+//    }
+
+//    @Bean
+//    public CommandLineRunner testUserService(UserService userService) {
+//        return args -&gt; {
+//            // Create a new user
+//            User user = new User();
+//            user.setUsername(&quot;john_doe&quot;);
+//            user.setEmail(&quot;john.doe@example.com&quot;);
+//            user.setFullName(&quot;John Doe&quot;);
+//            user.setPassword(&quot;securepassword&quot;);
+//            user.setIsMfaEnabled(true);
+//            User savedUser = userService.createUser(user);
+//            System.out.println(&quot;Created User: &quot; + savedUser);
+//
+//            // Fetch the user by username
+//            Optional&lt;User&gt; fetchedUser = userService.getUserByUsername(&quot;john_doe&quot;);
+//            System.out.println(&quot;Fetched User: &quot; + fetchedUser.orElse(null));
+//        };
+//    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ArticleServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">library</a> &gt; <a href="index.source.html" class="el_package">com.astandro.library.service.impl</a> &gt; <span class="el_source">ArticleServiceImpl.java</span></div><h1>ArticleServiceImpl.java</h1><pre class="source lang-java linenums">package com.astandro.library.service.impl;
+
+import com.astandro.library.repository.ArticleRepository;
+import com.astandro.library.repository.entity.Article;
+import com.astandro.library.repository.entity.User;
+import com.astandro.library.service.ArticleService;
+import com.astandro.library.service.UserService;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class ArticleServiceImpl implements ArticleService {
+
+    private final ArticleRepository ArticleRepository;
+    private final UserService UserService;
+
+<span class="fc" id="L19">    public ArticleServiceImpl(ArticleRepository ArticleRepository, UserService UserService) {</span>
+<span class="fc" id="L20">        this.ArticleRepository = ArticleRepository;</span>
+<span class="fc" id="L21">        this.UserService = UserService;</span>
+<span class="fc" id="L22">    }</span>
+
+    public boolean isOwnedByCurrentUser(Long articleId, String username) {
+<span class="fc" id="L25">        Article article = ArticleRepository.findById(articleId)</span>
+<span class="fc" id="L26">                .orElseThrow(() -&gt; new RuntimeException(&quot;Article not found&quot;));</span>
+<span class="fc" id="L27">        Long authorId = article.getAuthorId();</span>
+
+<span class="fc" id="L29">        Optional&lt;User&gt; user = UserService.getUserById(authorId);</span>
+<span class="pc bpc" id="L30" title="1 of 4 branches missed.">        return user.isPresent() &amp;&amp; user.get().getUsername().equals(username);</span>
+    }
+
+    @Override
+    public Article createArticle(Article article) {
+<span class="fc" id="L35">        return ArticleRepository.save(article);</span>
+    }
+
+    @Override
+    public Optional&lt;Article&gt; getArticleById(Long id) {
+<span class="fc" id="L40">        return ArticleRepository.findById(id);</span>
+    }
+
+    @Override
+    public List&lt;Article&gt; getAllArticles() {
+<span class="fc" id="L45">        return ArticleRepository.findAll();</span>
+    }
+
+    @Override
+    public Article updateArticle(Long id, Article article) {
+<span class="fc" id="L50">        return ArticleRepository.findById(id)</span>
+<span class="fc" id="L51">                .map(existingArticle -&gt; {</span>
+<span class="fc" id="L52">                    existingArticle.setTitle(article.getTitle());</span>
+<span class="fc" id="L53">                    existingArticle.setAuthorId(article.getAuthorId());</span>
+<span class="fc" id="L54">                    existingArticle.setContent(article.getContent());</span>
+<span class="fc" id="L55">                    return ArticleRepository.save(existingArticle);</span>
+                })
+<span class="fc" id="L57">                .orElseThrow(() -&gt; new RuntimeException(&quot;Article not found with id &quot; + id));</span>
+    }
+
+    @Override
+    public void deleteArticle(Long id) {
+<span class="fc" id="L62">        ArticleRepository.deleteById(id);</span>
+<span class="fc" id="L63">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

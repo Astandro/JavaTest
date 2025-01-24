@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>User.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">library</a> &gt; <a href="index.source.html" class="el_package">com.astandro.library.repository.entity</a> &gt; <span class="el_source">User.java</span></div><h1>User.java</h1><pre class="source lang-java linenums">package com.astandro.library.repository.entity;
+
+import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
+
+@Entity
+@Table(name = &quot;users&quot;)
+public class User implements UserDetails {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, unique = true)
+    private String username;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false)
+    private String fullName;
+
+    @Column(nullable = false)
+    private String password;
+
+<span class="fc" id="L31">    @Column(nullable = false)</span>
+<span class="fc" id="L32">    private Boolean isMfaEnabled = false;</span>
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+
+<span class="fc" id="L40">    public User() {}</span>
+
+    @PrePersist
+    protected void onCreate() {
+<span class="nc" id="L44">        this.createdAt = LocalDateTime.now();</span>
+<span class="nc" id="L45">        this.updatedAt = LocalDateTime.now();</span>
+<span class="nc" id="L46">    }</span>
+
+    @PreUpdate
+    protected void onUpdate() {
+<span class="nc" id="L50">        this.updatedAt = LocalDateTime.now();</span>
+<span class="nc" id="L51">    }</span>
+
+    public Long getId() {
+<span class="fc" id="L54">        return id;</span>
+    }
+
+    public void setId(Long id) {
+<span class="fc" id="L58">        this.id = id;</span>
+<span class="fc" id="L59">    }</span>
+
+    public String getUsername() {
+<span class="fc" id="L62">        return username;</span>
+    }
+
+    public void setUsername(String username) {
+<span class="fc" id="L66">        this.username = username;</span>
+<span class="fc" id="L67">    }</span>
+
+    public String getEmail() {
+<span class="fc" id="L70">        return email;</span>
+    }
+
+    public void setEmail(String email) {
+<span class="fc" id="L74">        this.email = email;</span>
+<span class="fc" id="L75">    }</span>
+
+    public String getFullName() {
+<span class="fc" id="L78">        return fullName;</span>
+    }
+
+    public void setFullName(String fullName) {
+<span class="fc" id="L82">        this.fullName = fullName;</span>
+<span class="fc" id="L83">    }</span>
+
+    public String getPassword() {
+<span class="fc" id="L86">        return password;</span>
+    }
+
+    public void setPassword(String password) {
+<span class="fc" id="L90">        this.password = password;</span>
+<span class="fc" id="L91">    }</span>
+
+    public Boolean getIsMfaEnabled() {
+<span class="fc" id="L94">        return isMfaEnabled;</span>
+    }
+
+    public void setRoles(Set&lt;Role&gt; roles) {
+<span class="fc" id="L98">        this.roles = roles;</span>
+<span class="fc" id="L99">    }</span>
+
+    public LocalDateTime getCreatedAt() {
+<span class="fc" id="L102">        return createdAt;</span>
+    }
+
+    public LocalDateTime getUpdatedAt() {
+<span class="fc" id="L106">        return updatedAt;</span>
+    }
+
+<span class="fc" id="L109">    public User(String username, String email, String fullName, String password, Boolean isMfaEnabled) {</span>
+<span class="fc" id="L110">        this.username = username;</span>
+<span class="fc" id="L111">        this.email = email;</span>
+<span class="fc" id="L112">        this.fullName = fullName;</span>
+<span class="fc" id="L113">        this.password = password;</span>
+<span class="fc" id="L114">        this.isMfaEnabled = isMfaEnabled;</span>
+<span class="fc" id="L115">    }</span>
+
+    public void setMfaEnabled() {
+<span class="fc" id="L118">        this.isMfaEnabled = true;</span>
+<span class="fc" id="L119">    }</span>
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = &quot;user_roles&quot;,
+            joinColumns = @JoinColumn(name = &quot;user_id&quot;),
+            inverseJoinColumns = @JoinColumn(name = &quot;role_id&quot;)
+    )
+    private Set&lt;Role&gt; roles;
+
+    @Override
+    public Collection&lt;? extends GrantedAuthority&gt; getAuthorities() {
+<span class="fc" id="L131">        return Collections.singleton(() -&gt; &quot;ROLE_&quot; + roles.iterator().next().getName());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

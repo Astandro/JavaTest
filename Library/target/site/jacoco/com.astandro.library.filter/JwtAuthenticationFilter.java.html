@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JwtAuthenticationFilter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">library</a> &gt; <a href="index.source.html" class="el_package">com.astandro.library.filter</a> &gt; <span class="el_source">JwtAuthenticationFilter.java</span></div><h1>JwtAuthenticationFilter.java</h1><pre class="source lang-java linenums">package com.astandro.library.filter;
+
+import com.astandro.library.config.JwtTokenUtil;
+import com.astandro.library.repository.UserRepository;
+import com.astandro.library.repository.entity.User;
+import com.astandro.library.service.UserService;
+import com.astandro.library.service.impl.UserServiceImpl;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Optional;
+
+@Component
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private final JwtTokenUtil jwtTokenUtil;
+    private final UserRepository userRepository;
+
+<span class="fc" id="L28">    public JwtAuthenticationFilter(JwtTokenUtil jwtTokenUtil, UserRepository userRepository) {</span>
+<span class="fc" id="L29">        this.jwtTokenUtil = jwtTokenUtil;</span>
+<span class="fc" id="L30">        this.userRepository = userRepository;</span>
+<span class="fc" id="L31">    }</span>
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+<span class="nc" id="L36">        String authorizationHeader = request.getHeader(&quot;Authorization&quot;);</span>
+
+        // Skip filtering for login, registration, and Swagger paths
+<span class="nc" id="L39">        String path = request.getRequestURI();</span>
+<span class="nc bnc" id="L40" title="All 8 branches missed.">        if (path.startsWith(&quot;/api/auth&quot;) || path.startsWith(&quot;/swagger-ui&quot;) || path.startsWith(&quot;/v3/api-docs&quot;) || path.startsWith(&quot;/favicon&quot;)) {</span>
+<span class="nc" id="L41">            filterChain.doFilter(request, response);</span>
+<span class="nc" id="L42">            return;</span>
+        }
+
+<span class="nc bnc" id="L45" title="All 4 branches missed.">        if (authorizationHeader != null &amp;&amp; authorizationHeader.startsWith(&quot;Bearer &quot;)) {</span>
+<span class="nc" id="L46">            String jwt = authorizationHeader.substring(7);</span>
+<span class="nc" id="L47">            String username = jwtTokenUtil.extractUsername(jwt);</span>
+
+<span class="nc bnc" id="L49" title="All 4 branches missed.">            if (username != null &amp;&amp; SecurityContextHolder.getContext().getAuthentication() == null) {</span>
+<span class="nc" id="L50">                Optional&lt;User&gt; optionalUser = userRepository.findByUsername(username)</span>
+<span class="nc" id="L51">                        .or(() -&gt; userRepository.findByEmail(username));</span>
+
+<span class="nc bnc" id="L53" title="All 2 branches missed.">                if (optionalUser.isPresent()) {</span>
+<span class="nc" id="L54">                    User user = optionalUser.get();</span>
+<span class="nc bnc" id="L55" title="All 2 branches missed.">                    if (jwtTokenUtil.validateToken(jwt, user.getUsername())) {</span>
+<span class="nc" id="L56">                        Collection&lt;GrantedAuthority&gt; authorities = (Collection&lt;GrantedAuthority&gt;) user.getAuthorities();</span>
+<span class="nc" id="L57">                        UsernamePasswordAuthenticationToken authenticationToken =</span>
+                                new UsernamePasswordAuthenticationToken(user, null, authorities);
+<span class="nc" id="L59">                        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));</span>
+<span class="nc" id="L60">                        SecurityContextHolder.getContext().setAuthentication(authenticationToken);</span>
+                    }
+                }
+            }
+        }
+
+<span class="nc" id="L66">        filterChain.doFilter(request, response);</span>
+<span class="nc" id="L67">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

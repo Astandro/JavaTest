@@ -1,0 +1,40 @@
+version: '3.8'
+services:
+  # Spring Boot application service
+  app:
+    build: .
+    container_name: spring_boot_app
+    ports:
+      - "8080:8080"  # Expose port 8080 for accessing the app in the browser
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev  # Optional: Set active Spring profile (e.g., dev, prod)
+    networks:
+      - app-network
+  postgres:
+    image: postgres:15
+    container_name: postgres-container
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: library
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379" # Map Redis default port
+    volumes:
+      - redis-data:/data # Persistent data storage
+
+volumes:
+  postgres_data:
+    driver: local
+  redis-data:
+
+networks:
+  app-network:
+    driver: bridge

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuditLogAspect.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">library</a> &gt; <a href="index.source.html" class="el_package">com.astandro.library.aspect</a> &gt; <span class="el_source">AuditLogAspect.java</span></div><h1>AuditLogAspect.java</h1><pre class="source lang-java linenums">package com.astandro.library.aspect;
+
+import com.astandro.library.config.JwtTokenUtil;
+import com.astandro.library.service.AuditService;
+import com.astandro.library.util.LoggingUtil;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+@Aspect
+@Component
+public class AuditLogAspect {
+
+    private final AuditService auditService;
+    private final LoggingUtil loggingUtil;
+    private final JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+<span class="fc" id="L29">    public AuditLogAspect(AuditService auditService, LoggingUtil loggingUtil, JwtTokenUtil jwtTokenUtil) {</span>
+<span class="fc" id="L30">        this.auditService = auditService;</span>
+<span class="fc" id="L31">        this.loggingUtil = loggingUtil;</span>
+<span class="fc" id="L32">        this.jwtTokenUtil = jwtTokenUtil;</span>
+<span class="fc" id="L33">    }</span>
+
+    // Define the pointcut: Apply to all methods in the service layer
+    @Pointcut(&quot;execution(* com.astandro.library.service..*(..)) &amp;&amp; !execution(* com.astandro.library.service.AuditService.*(..))&quot;)
+<span class="nc" id="L37">    public void serviceLayer() {}</span>
+
+    // After the method returns, log the action
+    @AfterReturning(&quot;serviceLayer()&quot;)
+    public void logAction(JoinPoint joinPoint) {
+<span class="fc" id="L42">        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();</span>
+
+        // Get the HTTP request from the RequestContextHolder
+<span class="fc" id="L45">        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();</span>
+<span class="fc" id="L46">        String authorizationHeader = request.getHeader(&quot;Authorization&quot;);</span>
+<span class="fc" id="L47">        String username = null;</span>
+
+<span class="pc bpc" id="L49" title="2 of 4 branches missed.">        if (authorizationHeader != null &amp;&amp; authorizationHeader.startsWith(&quot;Bearer &quot;)) {</span>
+<span class="fc" id="L50">            String jwt = authorizationHeader.substring(7);</span>
+<span class="fc" id="L51">            username = jwtTokenUtil.extractUsername(jwt);</span>
+        }
+
+        // Get the action name (method name)
+<span class="fc" id="L55">        String action = joinPoint.getSignature().getName();</span>
+
+        // Get IP address from the HTTP request
+<span class="fc" id="L58">        String ip = request.getRemoteAddr();</span>
+
+        // Get the browser information from the HTTP request headers
+<span class="fc" id="L61">        String browser = request.getHeader(&quot;User-Agent&quot;);</span>
+
+        // Get the device information from the User-Agent (simple example, can be extended)
+<span class="fc" id="L64">        String device = extractDeviceFromUserAgent(browser);</span>
+
+        // Log the action in the Audit Service (save to database)
+<span class="fc" id="L67">        auditService.logAction(username, action, ip, browser, device);</span>
+
+        // Log the audit information to the logs (real-time logging)
+<span class="fc" id="L70">        loggingUtil.logAuditInfo(username, action, ip, browser, device);</span>
+<span class="fc" id="L71">    }</span>
+
+    // Helper method to extract device information from User-Agent string
+    private String extractDeviceFromUserAgent(String userAgent) {
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">        if (userAgent == null) {</span>
+<span class="nc" id="L76">            return &quot;Unknown Device&quot;;</span>
+        }
+
+        // Basic check to detect mobile device
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">        if (userAgent.contains(&quot;Mobile&quot;)) {</span>
+<span class="nc" id="L81">            return &quot;Mobile Device&quot;;</span>
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">        } else if (userAgent.contains(&quot;Tablet&quot;)) {</span>
+<span class="nc" id="L83">            return &quot;Tablet Device&quot;;</span>
+        } else {
+<span class="fc" id="L85">            return &quot;Desktop Device&quot;;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

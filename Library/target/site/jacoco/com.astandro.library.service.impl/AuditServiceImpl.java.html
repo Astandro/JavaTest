@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuditServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">library</a> &gt; <a href="index.source.html" class="el_package">com.astandro.library.service.impl</a> &gt; <span class="el_source">AuditServiceImpl.java</span></div><h1>AuditServiceImpl.java</h1><pre class="source lang-java linenums">package com.astandro.library.service.impl;
+
+import com.astandro.library.repository.AuditLogRepository;
+import com.astandro.library.repository.entity.AuditLog;
+import com.astandro.library.service.AuditService;
+import com.astandro.library.util.LoggingUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+
+@Service
+public class AuditServiceImpl implements AuditService {
+
+    private final AuditLogRepository auditLogRepository;
+    private final LoggingUtil loggingUtil;
+
+    @Autowired
+<span class="fc" id="L19">    public AuditServiceImpl(AuditLogRepository auditLogRepository, LoggingUtil loggingUtil) {</span>
+<span class="fc" id="L20">        this.auditLogRepository = auditLogRepository;</span>
+<span class="fc" id="L21">        this.loggingUtil = loggingUtil;</span>
+<span class="fc" id="L22">    }</span>
+
+    @Override
+    public void logAction(String username, String action, String ip, String browser, String device) {
+        // Save audit log to the database
+<span class="fc" id="L27">        AuditLog auditLog = new AuditLog();</span>
+<span class="fc" id="L28">        auditLog.setUsername(username);</span>
+<span class="fc" id="L29">        auditLog.setAction(action);</span>
+<span class="fc" id="L30">        auditLog.setIp(ip);</span>
+<span class="fc" id="L31">        auditLog.setBrowser(browser);</span>
+<span class="fc" id="L32">        auditLog.setDevice(device);</span>
+<span class="fc" id="L33">        auditLog.setTimestamp(LocalDateTime.now());</span>
+
+<span class="fc" id="L35">        auditLogRepository.save(auditLog);</span>
+
+        // Log audit info using LoggingUtil
+<span class="fc" id="L38">        loggingUtil.logAuditInfo(username, action, ip, browser, device);</span>
+<span class="fc" id="L39">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

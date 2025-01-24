@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SecurityConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">library</a> &gt; <a href="index.source.html" class="el_package">com.astandro.library.config</a> &gt; <span class="el_source">SecurityConfig.java</span></div><h1>SecurityConfig.java</h1><pre class="source lang-java linenums">package com.astandro.library.config;
+
+import com.astandro.library.filter.JwtAuthenticationFilter;
+import com.astandro.library.service.UserService;
+import com.astandro.library.service.impl.UserServiceImpl;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+@Configuration
+public class SecurityConfig {
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final UserService userService;
+
+<span class="fc" id="L23">    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, UserServiceImpl userService) {</span>
+<span class="fc" id="L24">        this.jwtAuthenticationFilter = jwtAuthenticationFilter;</span>
+<span class="fc" id="L25">        this.userService = userService;</span>
+<span class="fc" id="L26">    }</span>
+
+    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        return http
+//                .csrf().disable()
+//                .authorizeHttpRequests() // For Spring Security 5.5+
+//                .requestMatchers(
+//                        &quot;/api/auth/**&quot;,         // Allow login, registration, etc.
+//                        &quot;/swagger-ui/**&quot;,       // Allow Swagger UI
+//                        &quot;/v3/api-docs/**&quot;,      // Allow API docs
+//                        &quot;/swagger-ui.html&quot;,     // Allow Swagger HTML
+//                        &quot;/configuration/ui&quot;,
+//                        &quot;/swagger-resources/**&quot;,
+//                        &quot;/configuration/security&quot;,
+//                        &quot;/webjars/**&quot;,
+//                        &quot;/v3/**&quot;
+//                ).permitAll() // No authentication needed for these
+//                .requestMatchers(HttpMethod.GET, &quot;/api/articles/**&quot;)
+//                .hasAnyRole(&quot;SUPER_ADMIN&quot;, &quot;EDITOR&quot;, &quot;CONTRIBUTOR&quot;, &quot;VIEWER&quot;)
+//                .requestMatchers(HttpMethod.POST, &quot;/api/articles/**&quot;)
+//                .hasAnyRole(&quot;SUPER_ADMIN&quot;, &quot;EDITOR&quot;, &quot;CONTRIBUTOR&quot;)
+//                .anyRequest().authenticated() // Protect other endpoints
+//                .and()
+//                .sessionManagement()
+//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Stateless sessions
+//                .and()
+//                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+//                .build();
+//    }
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+<span class="fc" id="L57">        return http</span>
+<span class="fc" id="L58">                .csrf().disable()</span>
+<span class="fc" id="L59">                .authorizeRequests()</span>
+<span class="fc" id="L60">                .requestMatchers(&quot;/**&quot;).permitAll() // Allow Swagger UI and OpenAPI</span>
+<span class="fc" id="L61">                .anyRequest().authenticated() // Protect other endpoints</span>
+<span class="fc" id="L62">                .and()</span>
+<span class="fc" id="L63">                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Stateless sessions</span>
+<span class="fc" id="L64">                .and()</span>
+<span class="fc" id="L65">                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)</span>
+<span class="fc" id="L66">                .build();</span>
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+<span class="fc" id="L71">        return new BCryptPasswordEncoder();</span>
+    }
+
+    @Configuration
+    @EnableGlobalMethodSecurity(prePostEnabled = true)
+<span class="fc" id="L76">    public class MethodSecurityConfig {</span>
+        // Enables @PreAuthorize annotations for RBAC
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

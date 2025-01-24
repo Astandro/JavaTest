@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">library</a> &gt; <a href="index.source.html" class="el_package">com.astandro.library.service.impl</a> &gt; <span class="el_source">AuthServiceImpl.java</span></div><h1>AuthServiceImpl.java</h1><pre class="source lang-java linenums">package com.astandro.library.service.impl;
+
+import com.astandro.library.config.JwtTokenUtil;
+import com.astandro.library.dto.LoginRequest;
+import com.astandro.library.dto.UserRegistration;
+import com.astandro.library.repository.RoleRepository;
+import com.astandro.library.repository.UserRepository;
+import com.astandro.library.repository.entity.Role;
+import com.astandro.library.repository.entity.RoleName;
+import com.astandro.library.repository.entity.User;
+import com.astandro.library.service.AuthService;
+import com.astandro.library.service.LoginAttemptService;
+import com.astandro.library.service.MfaService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+@Service
+@RequiredArgsConstructor // Generates constructor for final fields
+public class AuthServiceImpl implements AuthService {
+
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtTokenUtil jwtTokenUtil;
+    private final MfaService mfaService; // Ensure MfaServiceImpl is annotated with @Service
+    private final RedisTemplate&lt;String, String&gt; redisTemplate; // Ensure RedisTemplate is configured in your app
+
+    @Value(&quot;${otp.expiration.seconds:300}&quot;) // Default: 5 minutes if not configured in application.properties
+    private int otpExpirationSeconds;
+
+    @Autowired
+    private final LoginAttemptService loginAttemptService;
+
+    @Override
+    public String authenticate(LoginRequest loginRequest) {
+<span class="fc" id="L45">        String usernameOrEmail = loginRequest.getUsernameOrEmail();</span>
+<span class="fc" id="L46">        String password = loginRequest.getPassword();</span>
+<span class="fc" id="L47">        String otp = loginRequest.getOtp();</span>
+
+<span class="fc bfc" id="L49" title="All 2 branches covered.">        if (loginAttemptService.isBlocked(usernameOrEmail)) {</span>
+<span class="fc" id="L50">            throw new RuntimeException(&quot;Account locked due to too many failed login attempts. Try again later.&quot;);</span>
+        }
+
+        // Step 1: Find user by username or email
+<span class="fc" id="L54">        User user = userRepository.findByUsername(usernameOrEmail)</span>
+<span class="pc" id="L55">                .or(() -&gt; userRepository.findByEmail(usernameOrEmail))</span>
+<span class="pc" id="L56">                .orElseThrow(() -&gt; new RuntimeException(&quot;Invalid credentials&quot;));</span>
+
+        // Step 2: Validate password
+<span class="fc bfc" id="L59" title="All 2 branches covered.">        if (!passwordEncoder.matches(password, user.getPassword())) {</span>
+<span class="fc" id="L60">            loginAttemptService.loginFailed(usernameOrEmail);</span>
+<span class="fc" id="L61">            throw new RuntimeException(&quot;Invalid credentials&quot;);</span>
+        }
+
+        // Step 3: If MFA is enabled, verify OTP
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">        if (user.getIsMfaEnabled()) {</span>
+<span class="fc" id="L66">            String redisKey = &quot;otp:&quot; + user.getEmail();</span>
+
+            // If OTP is not provided, generate and send one
+<span class="pc bpc" id="L69" title="1 of 4 branches missed.">            if (otp == null || otp.isEmpty()) {</span>
+<span class="fc" id="L70">                String generatedOtp = mfaService.generateOtp();</span>
+<span class="fc" id="L71">                redisTemplate.opsForValue().set(redisKey, generatedOtp, otpExpirationSeconds, TimeUnit.SECONDS);</span>
+<span class="fc" id="L72">                mfaService.sendOtpEmail(user.getEmail(), generatedOtp);</span>
+<span class="fc" id="L73">                loginAttemptService.loginFailed(usernameOrEmail);</span>
+<span class="fc" id="L74">                throw new RuntimeException(&quot;OTP sent to your email. Please provide the OTP to complete login.&quot;);</span>
+            }
+
+            // Validate OTP
+<span class="fc" id="L78">            String storedOtp = redisTemplate.opsForValue().get(redisKey);</span>
+<span class="pc bpc" id="L79" title="3 of 4 branches missed.">            if (storedOtp == null || !storedOtp.equals(otp)) {</span>
+<span class="fc" id="L80">                loginAttemptService.loginFailed(usernameOrEmail);</span>
+<span class="fc" id="L81">                throw new RuntimeException(&quot;Invalid or expired OTP.&quot;);</span>
+            }
+
+            // Remove OTP from Redis after successful validation
+<span class="nc" id="L85">            redisTemplate.delete(redisKey);</span>
+        }
+
+        // Step 4: Generate JWT token
+<span class="nc" id="L89">        return jwtTokenUtil.generateToken(user.getUsername());</span>
+    }
+
+    @Override
+    public User registerUser(UserRegistration registration) {
+        // Check if username or email already exists
+<span class="fc bfc" id="L95" title="All 2 branches covered.">        if (userRepository.existsByUsername((registration.getUsername()))) {</span>
+<span class="fc" id="L96">            throw new RuntimeException(&quot;Username is already taken&quot;);</span>
+        }
+
+<span class="fc bfc" id="L99" title="All 2 branches covered.">        if (userRepository.existsByEmail((registration.getEmail()))) {</span>
+<span class="fc" id="L100">            throw new RuntimeException(&quot;Email is already in use&quot;);</span>
+        }
+
+        // Create new user
+<span class="fc" id="L104">        User user = new User();</span>
+<span class="fc" id="L105">        user.setUsername(registration.getUsername());</span>
+<span class="fc" id="L106">        user.setEmail(registration.getEmail());</span>
+<span class="fc" id="L107">        user.setFullName(registration.getFullName());</span>
+<span class="fc" id="L108">        user.setPassword(passwordEncoder.encode(registration.getPassword()));</span>
+
+        // Assign default role (VIEWER)
+<span class="fc" id="L111">        Role viewerRole = roleRepository.findByName(RoleName.VIEWER)</span>
+<span class="pc" id="L112">                .orElseThrow(() -&gt; new RuntimeException(&quot;Role not found!&quot;));</span>
+<span class="fc" id="L113">        user.setRoles(Set.of(viewerRole));</span>
+
+        // Save user to the database
+<span class="fc" id="L116">        return userRepository.save(user);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
