@@ -22,6 +22,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "Astandro"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/Astandro/JavaTest.git",
+    "accountId": "afcc2d47-6dbb-4731-a7d6-0d3283e1f503"
+  }
+}]]></component>
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
@@ -41,50 +53,50 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "JUnit.ArticleControllerTest.executor": "Run",
-    "JUnit.ArticleControllerTest.testCreateArticle.executor": "Run",
-    "JUnit.ArticleControllerTest.testUpdateArticle.executor": "Run",
-    "JUnit.ArticleServiceImplTest.executor": "Run",
-    "JUnit.ArticleTest.testArticleEntity.executor": "Run",
-    "JUnit.AuditLogAspectTest.testLogAction.executor": "Run",
-    "JUnit.AuditServiceImplTest.executor": "Run",
-    "JUnit.AuthControllerTest.testLogin.executor": "Run",
-    "JUnit.AuthControllerTest.testRegister.executor": "Run",
-    "JUnit.AuthControllerTest.testRequestOtp.executor": "Run",
-    "JUnit.AuthControllerTest.testVerifyOtp.executor": "Run",
-    "JUnit.AuthServiceImplTest.authenticateBlocked_throwsException.executor": "Run",
-    "JUnit.AuthServiceImplTest.authenticateWrongPassword_throwsException.executor": "Run",
-    "JUnit.AuthServiceImplTest.authenticatevalidateOTP_throwsException.executor": "Run",
-    "JUnit.AuthServiceImplTest.executor": "Run",
-    "JUnit.LoginAttemptServiceImplTest.executor": "Run",
-    "JUnit.MfaServiceImplTest.executor": "Run",
-    "JUnit.MfaServiceImplTest.testGenerateAndSendOtp.executor": "Run",
-    "JUnit.MfaServiceImplTest.testValidateOtp.executor": "Run",
-    "JUnit.UserControllerTest.testDeleteUser.executor": "Run",
-    "JUnit.UserControllerTest.testGetUserById.executor": "Run",
-    "JUnit.UserControllerTest.testGetUserByUsername.executor": "Run",
-    "JUnit.UserServiceImplTest.executor": "Run",
-    "JUnit.UserTest.executor": "Coverage",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "Spring Boot.LibraryApplication.executor": "Run",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/astandro/Projects/ITSECTest/Library",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;JUnit.ArticleControllerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ArticleControllerTest.testCreateArticle.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ArticleControllerTest.testUpdateArticle.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ArticleServiceImplTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ArticleTest.testArticleEntity.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AuditLogAspectTest.testLogAction.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AuditServiceImplTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AuthControllerTest.testLogin.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AuthControllerTest.testRegister.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AuthControllerTest.testRequestOtp.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AuthControllerTest.testVerifyOtp.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AuthServiceImplTest.authenticateBlocked_throwsException.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AuthServiceImplTest.authenticateWrongPassword_throwsException.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AuthServiceImplTest.authenticatevalidateOTP_throwsException.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AuthServiceImplTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.LoginAttemptServiceImplTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.MfaServiceImplTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.MfaServiceImplTest.testGenerateAndSendOtp.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.MfaServiceImplTest.testValidateOtp.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserControllerTest.testDeleteUser.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserControllerTest.testGetUserById.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserControllerTest.testGetUserByUsername.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserServiceImplTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserTest.executor&quot;: &quot;Coverage&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;Spring Boot.LibraryApplication.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/astandro/Projects/ITSECTest/Library&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="ReactorSettings">
     <option name="notificationShown" value="true" />
   </component>
@@ -203,6 +215,7 @@
       <updated>1737539556527</updated>
       <workItem from="1737539557798" duration="63324000" />
       <workItem from="1737730320639" duration="105000" />
+      <workItem from="1738229290549" duration="21000" />
     </task>
     <servers />
   </component>
